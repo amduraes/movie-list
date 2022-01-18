@@ -1,10 +1,11 @@
+import { useContext } from 'react';
 import {
 	makeStyles,
 	Typography,
 	ButtonBase,
 } from '@material-ui/core'
-import CloseRounded from '@material-ui/icons/CloseRounded'
-import useGetMovies from '../hooks/useGetMovies';
+import CloseRounded from '@material-ui/icons/CloseRounded';
+import { DataContext } from '../contexts/DataContext';
 
 const useStyles = makeStyles({
 	loading: {
@@ -58,9 +59,9 @@ const useStyles = makeStyles({
 	}
 })
 
-const MovieDetails = ({ movieDetails, handleClose }) => {
+const MovieDetails = ({ movieDetails, handleDetailClose }) => {
 	const classes = useStyles()
-	const { isLoading } = useGetMovies()
+	const { isLoading } = useContext(DataContext)
 
 	const {
 		title,
@@ -82,7 +83,7 @@ const MovieDetails = ({ movieDetails, handleClose }) => {
 				<div className={classes.container}>
 					<div className={classes.titleContainer}>
 						<Typography className={classes.title}>{title}</Typography>
-						<ButtonBase className={classes.closeButton} onClick={handleClose}>
+						<ButtonBase className={classes.closeButton} onClick={handleDetailClose}>
 							<CloseRounded/>
 							<span className={classes.closeSpan}>CLOSE</span>
 						</ButtonBase>

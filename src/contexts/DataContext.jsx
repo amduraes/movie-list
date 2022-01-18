@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { createContext, useState, useEffect } from 'react'
 import axios from 'axios';
 
-const useGetMovies = (pageNumber, pageSize, id, yearStart, yearEnd, isTop10Year) => {
+export const DataContext = createContext()
+
+const DataContextProvider = ({ children }) => {
 	const [allMovieData, setAllMovieData] = useState([]);
 	const [movies, setMovies] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -12,6 +14,12 @@ const useGetMovies = (pageNumber, pageSize, id, yearStart, yearEnd, isTop10Year)
 	const [sortedTop10, setSortedTop10] = useState([])
 	const [yearList, setYearList] = useState([])
 
+	const [pageNumber, setPageNumber] = useState(0);
+	const [pageSize, setPageSize] = useState(10);
+	const [id, setId] = useState('');
+	const [yearStart, setYearStart] = useState(null);
+	const [yearEnd, setYearEnd] = useState(null);
+
 	useEffect(() => {
 		axios({
 			baseURL: 'http://movie-challenge-api-xpand.azurewebsites.net/api/movies',
@@ -21,6 +29,12 @@ const useGetMovies = (pageNumber, pageSize, id, yearStart, yearEnd, isTop10Year)
 			})
 			.catch(() => setHasError(true))
 	}, [])
+
+	useEffect(() => {
+		let list = allMovieData.map((mov) => mov.year).sort().reverse()
+		setYearList([...new Set(list)])
+
+	}, [allMovieData])
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -35,7 +49,7 @@ const useGetMovies = (pageNumber, pageSize, id, yearStart, yearEnd, isTop10Year)
 				setIsLoading(false);
 			})
 			.catch(() => setHasError(true));
-	}, [pageNumber, pageSize]);
+	}, [pageNumber, pageSize])
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -77,14 +91,32 @@ const useGetMovies = (pageNumber, pageSize, id, yearStart, yearEnd, isTop10Year)
 	}, [moviesByYear])
 
 
-	useEffect(() => {
-	let list = allMovieData.map((mov) => mov.year).sort().reverse()
-		setYearList([...new Set(list)])
+	return (
+		<DataContext.Provider
+			value={{
+				allMovieData,
+				movies,
+				isLoading,
+				hasError,
+				hasMore,
+				movieDetails,
+				moviesByYear,
+				sortedTop10,
+				yearList,
+				pageNumber,
+				pageSize,
+				id,
+				yearStart,
+				yearEnd,
+				setPageNumber,
+				setPageSize,
+				setId,
+				setYearStart,
+				setYearEnd,
+			}}>
+			{children}
+		</DataContext.Provider>
+	)
+}
 
-	}, [allMovieData])
-
-
-	return { allMovieData, movies, isLoading, hasError, hasMore, movieDetails, moviesByYear, sortedTop10, yearList };
-};
-
-export default useGetMovies;
+export default DataContextProvider
